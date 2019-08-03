@@ -24,6 +24,8 @@ class StackLayoutManager : RecyclerView.LayoutManager() {
     //item完整的一次滑动距离
     private var mItemFullScrollDistance = 0
 
+    var onScrollListener: OnScrollListener? = null
+
     override fun generateDefaultLayoutParams() = RecyclerView.LayoutParams(wrapContent, wrapContent)
 
     override fun onLayoutChildren(recycler: RecyclerView.Recycler, state: RecyclerView.State) {
@@ -95,6 +97,7 @@ class StackLayoutManager : RecyclerView.LayoutManager() {
                     left + getDecoratedMeasuredWidth(child),
                     paddingTop + getDecoratedMeasuredHeight(child)
                 )
+                onScrollListener?.onStacking(this, child, i, mMaxStackCount, i, progress, dx)
             }
             //平铺区域
             else {
@@ -117,6 +120,11 @@ class StackLayoutManager : RecyclerView.LayoutManager() {
                     left + getDecoratedMeasuredWidth(child),
                     paddingTop + getDecoratedMeasuredHeight(child)
                 )
+                if (i == mFirstVisiblePosition + mMaxStackCount) {
+                    onScrollListener?.onFocusing(this, child, i, progress, dx)
+                } else {
+                    onScrollListener?.onSpreading(this, child, i, progress, dx)
+                }
             }
         }
 
@@ -141,5 +149,26 @@ class StackLayoutManager : RecyclerView.LayoutManager() {
     private fun computeVerticalSpacing(child: View): Int {
         val lp = child.layoutParams as RecyclerView.LayoutParams
         return getDecoratedMeasuredHeight(child) + lp.topMargin + lp.bottomMargin
+    }
+
+
+    /**
+     * @see https://blog.csdn.net/ccy0122/article/details/90515386#commentBox
+     */
+    interface OnScrollListener {
+        fun onStacking(
+            manager: StackLayoutManager, view: View, viewLayer: Int,
+            maxLayerCount: Int, position: Int, fraction: Float, offset: Int
+        )
+
+        fun onFocusing(
+            manager: StackLayoutManager, view: View, position: Int,
+            fraction: Float, offset: Int
+        )
+
+        fun onSpreading(
+            manager: StackLayoutManager, view: View, position: Int,
+            fraction: Float, offset: Int
+        )
     }
 }
