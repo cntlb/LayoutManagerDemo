@@ -2,16 +2,15 @@ package com.example.recycler.stack
 
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.View
+import android.util.Log
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.example.recycler.R
-import com.example.recycler.TestAdapter
 import kotlinx.android.synthetic.main.activity_stack_manager.*
-import org.jetbrains.anko.backgroundColor
+import org.jetbrains.anko.sdk27.coroutines.onClick
 
 class StackManagerActivity : AppCompatActivity() {
 
@@ -27,7 +26,9 @@ class StackManagerActivity : AppCompatActivity() {
 
 
     class StackAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-        private val colors = listOf(Color.RED, Color.GREEN, Color.BLUE, Color.CYAN, Color.MAGENTA)
+        private val colors =
+            listOf(Color.RED, Color.parseColor("#FFA500"), Color.YELLOW, Color.GREEN, Color.CYAN, Color.BLUE, Color.MAGENTA)
+
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
             val view = ImageView(parent.context).apply {
                 layoutParams = RecyclerView.LayoutParams(200, 300)
@@ -35,10 +36,15 @@ class StackManagerActivity : AppCompatActivity() {
             return object : RecyclerView.ViewHolder(view) {}
         }
 
-        override fun getItemCount() = 100
+        override fun getItemCount() = 50
 
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-            (holder.itemView as ImageView).setImageDrawable(ColorDrawable(colors[position % colors.size]))
+            (holder.itemView as ImageView).apply{
+                setImageDrawable(ColorDrawable(colors[position % colors.size]))
+                onClick {
+                    Log.e(javaClass.simpleName, "$position")
+                }
+            }
         }
     }
 }
